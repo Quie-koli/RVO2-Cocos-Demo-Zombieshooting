@@ -1,0 +1,100 @@
+{
+  "ver": "2.3.12",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "be390fad-7321-483b-954f-df3029c6ec8d",
+  "files": [
+    "__original-animation-0.cconb"
+  ],
+  "subMetas": {
+    "18d6f": {
+      "importer": "gltf-animation",
+      "uuid": "be390fad-7321-483b-954f-df3029c6ec8d@18d6f",
+      "displayName": "",
+      "id": "18d6f",
+      "name": "runright.animation",
+      "userData": {
+        "gltfIndex": 0,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 0.5
+        },
+        "events": []
+      },
+      "ver": "1.0.17",
+      "imported": true,
+      "files": [
+        ".cconb"
+      ],
+      "subMetas": {}
+    },
+    "a7194": {
+      "importer": "gltf-scene",
+      "uuid": "be390fad-7321-483b-954f-df3029c6ec8d@a7194",
+      "displayName": "",
+      "id": "a7194",
+      "name": "Run Right.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "animationImportSettings": [
+      {
+        "name": "mixamo.com",
+        "duration": 0.5,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "runright",
+            "from": 0,
+            "to": 0.5,
+            "wrapMode": 2,
+            "previousId": "18d6f"
+          }
+        ]
+      }
+    ],
+    "redirect": "be390fad-7321-483b-954f-df3029c6ec8d@a7194",
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [],
+      "skeletons": [],
+      "textures": [],
+      "materials": [],
+      "scenes": [
+        "be390fad-7321-483b-954f-df3029c6ec8d@a7194"
+      ]
+    }
+  }
+}
