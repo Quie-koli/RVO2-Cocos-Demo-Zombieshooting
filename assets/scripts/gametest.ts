@@ -6,11 +6,11 @@ const { ccclass, property } = _decorator;
 
 @ccclass('gametest')
 export class gametest {
-    start() {
-       if(!GameMainManager.instance.player){
-        GameMainManager.instance.loadPlayer(new Vec3(0,0,0));
+    async start() {
+       while(!GameMainManager.instance.player){
+       await Sleep(100)
         
-    }
+        }
             for(let i=0;i<8;i++){
                 GameMainManager.instance.zombiemgr.get(0,new Vec3(i-4,0.8,0));
             }
@@ -21,3 +21,6 @@ export class gametest {
 
 
 }
+export const Sleep = (ms)=> {
+    return new Promise(resolve=>setTimeout(resolve, ms))
+  }
