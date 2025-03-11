@@ -4,16 +4,14 @@ import Vector2D from './rvo2/Vector2D';
 const { ccclass, property } = _decorator;
 
 @ccclass('zombieMgr')
-export class zombieMgr extends Component {
-    static instance: zombieMgr;
+export class zombieMgr {
     zombiespool: zombieCom[][];
     zombieshowings: Map<number, zombieCom> = new Map();
     zombieprefabs: Prefab[];
     numofzombietype=1;
     numofz=0;
     numofloadz=0;
-    protected onLoad(): void {
-        zombieMgr.instance=this;    
+    start_n(): void {
         let i: number;
         this.zombieprefabs=new Array(this.numofzombietype);
         this.zombiespool = new Array(this.numofzombietype);
@@ -31,9 +29,8 @@ export class zombieMgr extends Component {
     get(typeofz: number,pos: Vec3): zombieCom{
         let a: zombieCom;
         if(this.zombiespool[typeofz].length<=0){
-            
             let c = instantiate(this.zombieprefabs[typeofz]);
-            c.setParent(this.node);
+            c.setParent(GameMainManager.instance.node);
             a=new zombieCom();
             a.animcontroller=c.getComponent(animation.AnimationController);
             a.node=c;
@@ -47,6 +44,8 @@ export class zombieMgr extends Component {
             a.node.position=pos
             GameMainManager.instance.simulator.enableAgent(a.agentid)
             GameMainManager.instance.simulator.setAgentPosition(a.agentid,a.node.position.x,a.node.position.z);
+            a.animcontroller.setValue("state",0);
+            a.goal=undefined
         }
         a.attack=false;
         a.idletype=0;
@@ -83,4 +82,6 @@ export class zombieCom{
     count: number;
     agentid: number;
     goal: Vector2D;
+    dis_catching: number=10;
+    dis_hit: number=2; 
 }

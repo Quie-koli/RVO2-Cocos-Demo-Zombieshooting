@@ -1,17 +1,17 @@
 import { _decorator, Component, instantiate, Node, PhysicsSystem, Prefab, resources } from 'cc';
 import { bulletdata } from './bulletdata';
+import { GameMainManager } from './GameMainManager';
 const { ccclass, property } = _decorator;
 
-@ccclass('bulletmgr')
-export class bulletmgr extends Component {
-    static instance: bulletmgr;
+@ccclass('bulletMgr')
+export class bulletMgr{
     bulletprefab: Prefab;
     bulletpool: bulletdata[] = new Array(0);
     bulletshooting: Map<number, bulletdata> = new Map();
     bulletnum: number=0;
-    protected onLoad(): void { 
-        bulletmgr.instance=this;
-        resources.load("guns/bullet" , Prefab, (err, Prefab) => {this.bulletprefab = Prefab;});
+    start_n(): void { 
+        //bulletMgr.instance=this;
+        resources.load("bullet" , Prefab, (err, Prefab) => {this.bulletprefab = Prefab;});
     }
 
     start() {
@@ -32,7 +32,7 @@ export class bulletmgr extends Component {
         {
             a = instantiate(this.bulletprefab).getComponent(bulletdata);
             a.cid=this.bulletnum++;
-            a.node.setParent(this.node);
+            a.node.setParent(GameMainManager.instance.node);
         }
         else
         {

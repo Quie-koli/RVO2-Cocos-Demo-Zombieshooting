@@ -1,13 +1,14 @@
 import { _decorator, Component, Node, Vec3, RigidBody, animation, CCFloat, resources, Prefab, instantiate} from 'cc';
 import { playermodel } from './playermodel';
-import { gundata } from './gundata';
-import { bulletmgr } from './bulletmgr';
+import { weaponData } from './weaponData';
+import { bulletMgr } from './bulletmgr';
 import Vector2D from './rvo2/Vector2D';
+import { GameMainManager } from './GameMainManager';
+import { cameraAnim } from './cameraAnim';
 const { ccclass, property } = _decorator;
 
 @ccclass('playercontrol')
 export class playercontrol extends Component {
-    static instance: playercontrol;
     rgb: RigidBody;
     animesate = 0;
     nextanimesate = 0;
@@ -17,16 +18,18 @@ export class playercontrol extends Component {
     zero: Vec3 = new Vec3(0,0,0);
     @property(CCFloat)
     speed=2;
-    weapon: gundata;
+    weapon: weaponData;
     mynumofbullet=100;
     position: Vector2D=new Vector2D;
+    reloading=false;
+    @property
+    time_ReloadingAnim= 3.3;
+
     protected onLoad(): void {
-        playercontrol.instance=this;
     }
 
     start() {
         this.rgb = this.node.getComponent(RigidBody);
-        this.loadweapon("m4a1");
         this.model.plc=this;
     }
 
@@ -54,28 +57,33 @@ export class playercontrol extends Component {
         }
         this.position.x=this.node.position.x;
         this.position.y=this.node.position.z;
-       // this.rgb.setAngularVelocity(this.zero);
     }
     fire(){
+        if(!this.weapon || this.reloading)return
         if(this.weapon.bulletalreadyloaded<=0){
             this.reload();
             return;
         }
         this.model.animcontrol.setValue("shoot",true);
         this.weapon.animchange("shoot");
-        this.schedule(this.eject, 1.167/this.weapon.speed);
+        this.schedule(this.eject, this.weapon.time_ShootingAnim/this.weapon.speed);
     }
     stopfire(){
+        if(!this.weapon)return
         this.model.animcontrol.setValue("shoot",false);
         this.weapon.animchange("idle");
         this.unschedule(this.eject);
     }
     reload(){
+        if(!this.weapon)return
+        this.reloading=true
         this.model.animcontrol.setValue("reload",true);
         this.weapon.animchange("reload");
-        this.scheduleOnce(this.stopreload,3.3);
+        this.scheduleOnce(this.stopreload,this.time_ReloadingAnim);
     }
     stopreload(){
+        if(!this.weapon)return
+        this.reloading=false
         this.model.animcontrol.setValue("reload",false);
         this.weapon.animchange("idle");
         let a=Math.min(this.weapon.numofbullet,this.weapon.bulletalreadyloaded+this.mynumofbullet);
@@ -83,24 +91,28 @@ export class playercontrol extends Component {
         this.weapon.bulletalreadyloaded=a;
     }
 
-    loadweapon(gunname: string){
-        resources.load("guns/" + gunname, Prefab, (err, Prefab) => {
-            const newNode = instantiate(Prefab);
-            this.model.gunpoint.addChild(newNode);
-            this.weapon = newNode.getComponent(gundata);
-            this.model.animcontrol.setValue("shootspeed",this.weapon.speed);
-            this.weapon.muzzle.active=false
-        });
+    loadweapon(name: string){
+        if(this.weapon){
+            this.weapon.node.destroy();
+        }
+        const newNode = GameMainManager.instance.weaponmgr.get(name);
+        this.model.gunpoint.addChild(newNode);
+        this.reloading=false;
+        this.weapon = newNode.getComponent(weaponData);
+        this.model.animcontrol.setValue("shootspeed",this.weapon.speed);
+        this.weapon.muzzle.active=false
+        
     }
 
     eject(){
-        const a=bulletmgr.instance.get();
+        const a=GameMainManager.instance.bulletmgr.get();
         a.lifetime=100;
         a.node.position=this.weapon.muzzle.worldPosition;
         a.node.forward=this.weapon.muzzle.right.multiplyScalar(-1);
         this.weapon.bulletalreadyloaded--;
         this.weapon.muzzle.active=true
         this.scheduleOnce(this.hidemuzzlefire,0.1)
+        cameraAnim.instance.shaking(0.1,3);
         if(this.weapon.bulletalreadyloaded<=0){
             this.stopfire();
             this.reload();

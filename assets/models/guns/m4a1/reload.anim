@@ -1,7 +1,7 @@
 [
   {
     "__type__": "cc.AnimationClip",
-    "_name": "shoot",
+    "_name": "reload",
     "_objFlags": 0,
     "__editorExtras__": {
       "embeddedPlayerGroups": []

@@ -23,8 +23,8 @@ export default class KdTree {
       }
     }
 
-    if (this.agents.length > 0) {
-      this._buildAgentTreeRecursive(0, this.agents.length, 0);
+    if (this.agentTree.length> 0) {
+      this._buildAgentTreeRecursive(0, this.agents.length-1, 0);
     }
   }
 
@@ -211,7 +211,11 @@ export default class KdTree {
   }
 
   computeAgentNeighbors(agent: Agent, rangeSq: number) {
+    try{
     this._queryAgentTreeRecursive(agent, rangeSq, 0);
+    }catch{
+      
+    }
   }
 
   computeObstacleNeighbors(agent: Agent, rangeSq: number) {
