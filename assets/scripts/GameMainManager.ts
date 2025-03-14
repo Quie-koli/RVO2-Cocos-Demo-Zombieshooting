@@ -2,19 +2,21 @@ import { _decorator, Camera, Component, instantiate, Node, Prefab, resources, Sc
 import Simulator from './rvo2/Simulator';
 import RVOMath from "./rvo2/RVOMath"
 import Vector2D from "./rvo2/Vector2D";
-import { zombieCom, zombieMgr } from './zombieMgr';
+import { zombieMgr } from './zombieMgr';
 import { ObstacleCollect } from './ObstacleCollect';
 import { playercontrol } from './playercontrol';
-import { zombieSys } from './zombieSys';
+import { zombieCom, zombieSys } from './zombieSys';
 import { bulletMgr } from './bulletmgr';
 import { gametest } from './gametest';
 import { weaponMgr } from './weaponMgr';
+import { EntityManager } from './easy_ecs/EntityManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('GameMainManager')
 export class GameMainManager extends Component {
     static instance: GameMainManager;
     simulator: Simulator;
+    entityManager: EntityManager=new EntityManager()
     agentNodemap: Map<number,zombieCom>=new Map();
     @property(Number)
     ground_y:number;
@@ -71,8 +73,9 @@ export class GameMainManager extends Component {
 
     }
    protected update(dt: number): void {
-        this.zombiesys.update(dt)
+        //this.zombiesys.update(dt)
         this.bulletmgr.update(dt)
+        this.entityManager.update(dt)
    }
    
  

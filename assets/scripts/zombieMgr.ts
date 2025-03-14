@@ -1,6 +1,8 @@
 import { _decorator, animation, Component, instantiate, Node, Prefab, random, resources, Vec3 } from 'cc';
 import { GameMainManager } from './GameMainManager';
 import Vector2D from './rvo2/Vector2D';
+import { zombieCom } from './zombieSys';
+import { Entity } from './easy_ecs/EntityManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('zombieMgr')
@@ -31,7 +33,8 @@ export class zombieMgr {
         if(this.zombiespool[typeofz].length<=0){
             let c = instantiate(this.zombieprefabs[typeofz]);
             c.setParent(GameMainManager.instance.node);
-            a=new zombieCom();
+            let g=GameMainManager.instance.entityManager.addEntity()
+            a = GameMainManager.instance.entityManager.addComponent(g,zombieCom)
             a.animcontroller=c.getComponent(animation.AnimationController);
             a.node=c;
             a.zombietype=typeofz;
@@ -41,6 +44,7 @@ export class zombieMgr {
             a.agentid=GameMainManager.instance.addAgent(a)
         }else{
             a=this.zombiespool[typeofz].pop();
+            GameMainManager.instance.entityManager.setEntityActive(a.entity,true)
             a.node.position=pos
             GameMainManager.instance.simulator.enableAgent(a.agentid)
             GameMainManager.instance.simulator.setAgentPosition(a.agentid,a.node.position.x,a.node.position.z);
@@ -65,23 +69,8 @@ export class zombieMgr {
         this.zombiespool[z.zombietype].push(z);
         z.node.active=false;
         GameMainManager.instance.simulator.disableAgent(z.agentid)
+        GameMainManager.instance.entityManager.setEntityActive(z.entity,false)
     }
 }
 
 
-export class zombieCom{
-    zombietype: number;
-    id: number;
-    animcontroller: animation.AnimationController;
-    state: number;
-    attack: boolean;
-    idletype: number;
-    hp: number;
-    node: Node;
-    nextstate: number;
-    count: number;
-    agentid: number;
-    goal: Vector2D;
-    dis_catching: number=10;
-    dis_hit: number=2; 
-}

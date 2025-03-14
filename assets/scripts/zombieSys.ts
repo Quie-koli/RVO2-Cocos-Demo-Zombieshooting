@@ -1,29 +1,43 @@
-import { _decorator, Component, math, Node, quat, Quat, Vec3 } from 'cc';
+import { _decorator, animation, Component, math, Node, quat, Quat, Vec3 } from 'cc';
 import { zombieMgr } from './zombieMgr';
-import { zombieCom } from './zombieMgr';
 import { playercontrol } from './playercontrol';
 import Vector2D from './rvo2/Vector2D';
 import { GameMainManager } from './GameMainManager';
 import RVOMath from './rvo2/RVOMath';
+import { Entity, EntityManager, IComponent } from './easy_ecs/EntityManager';
+import { BaseSystem } from './easy_ecs/BaseSystem';
 const { ccclass, property } = _decorator;
 const rta=1/3.14*180;
-@ccclass('zombieSys')
-export class zombieSys{
 
+export class zombieCom extends IComponent{
+    zombietype: number;
+    id: number;
+    animcontroller: animation.AnimationController;
+    state: number;
+    attack: boolean;
+    idletype: number;
+    hp: number;
+    node: Node;
+    nextstate: number;
+    count: number;
+    agentid: number;
+    goal: Vector2D;
+    dis_catching: number=10;
+    dis_hit: number=2; 
+}
+
+@ccclass('zombieSys')
+export class zombieSys extends BaseSystem{
+    components: Map<Entity,zombieCom>=new Map()
     upfucs: Function[] = [this.idleup,this.idleup,this.runup,this.dieup];
     inifucs: Function[] = [this.idleini,this.idleini,this.runini,this.dieini];
-
-    async update(deltaTime: number) {
-        
-        GameMainManager.instance.zombiemgr.zombieshowings.forEach((value , key) =>{
-            this.upfucs[value.state](deltaTime,value);
-            if(value.nextstate != value.state){
-                value.state = value.nextstate;
-                value.animcontroller.setValue("state",value.state);
-                this.inifucs[value.state](value);
-            }
-           
-        });
+    async update(value, deltaTime: number) {
+        this.upfucs[value.state](deltaTime,value);
+        if(value.nextstate != value.state){
+            value.state = value.nextstate;
+            value.animcontroller.setValue("state",value.state);
+            this.inifucs[value.state](value);
+        }
     }
 
     idleup(deltaTime: number,z: zombieCom){
@@ -116,6 +130,7 @@ export class zombieSys{
 
 }
 
+EntityManager.registerComponent(new zombieSys,zombieCom)
 
 
 function getRandomIntInclusive(min: number, max: number): number {
