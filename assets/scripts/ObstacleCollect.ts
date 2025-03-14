@@ -5,6 +5,7 @@ const { ccclass, property } = _decorator;
 
 @ccclass('ObstacleCollect')
 export class ObstacleCollect extends Component {
+    
     start() {
         this.schedule(this.colleting,1,0)
         

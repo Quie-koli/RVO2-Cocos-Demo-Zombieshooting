@@ -98,16 +98,18 @@ export default class Simulator {
     this.agents.push(agent);
     this.agentsinuse.push(agent);
     this.goals.push(position);
-
+    this.kdTree.updatelist=true;
     return this.agents.length - 1;
   }
   disableAgent(id: number){
     this.agents[id].enable=false;
     this.agentListChanged=true;
+    this.kdTree.updatelist=true;
   }
   enableAgent(id: number){
     this.agents[id].enable=true;
     this.agentsinuse.push(this.agents[id]);
+    this.kdTree.updatelist=true;
   }
   //  /** float */ neighborDist, /** int */ maxNeighbors, /** float */ timeHorizon, /** float */ timeHorizonObst, /** float */ radius, /** float*/ maxSpeed, /** Vector2 */ velocity)
   setAgentDefaults(neighborDist: number,
@@ -198,7 +200,7 @@ export default class Simulator {
       }
 
       obstacle.id = this.obstacles.length;
-
+      
       this.obstacles.push(obstacle);
     }
 

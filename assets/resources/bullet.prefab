@@ -22,32 +22,23 @@
     "_components": [
       {
         "__id__": 2
-      },
-      {
-        "__id__": 4
-      },
-      {
-        "__id__": 6
-      },
-      {
-        "__id__": 8
       }
     ],
     "_prefab": {
-      "__id__": 10
+      "__id__": 4
     },
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": 1.828,
-      "y": 0.536,
+      "x": 1.8279999494552612,
+      "y": 0.5360000133514404,
       "z": 0
     },
     "_lrot": {
       "__type__": "cc.Quat",
-      "x": -0.49999999999999994,
+      "x": -0.4999999701976776,
       "y": 0,
       "z": 0,
-      "w": 0.8660254037844387
+      "w": 0.8660253882408142
     },
     "_lscale": {
       "__type__": "cc.Vec3",
@@ -59,7 +50,7 @@
     "_layer": 1073741824,
     "_euler": {
       "__type__": "cc.Vec3",
-      "x": -60,
+      "x": -59.99999511836994,
       "y": 0,
       "z": 0
     },
@@ -108,88 +99,6 @@
   {
     "__type__": "cc.CompPrefabInfo",
     "fileId": "b6l1uEp2VEur7kcUgOyyza"
-  },
-  {
-    "__type__": "cc.SphereCollider",
-    "_name": "",
-    "_objFlags": 0,
-    "__editorExtras__": {},
-    "node": {
-      "__id__": 1
-    },
-    "_enabled": true,
-    "__prefab": {
-      "__id__": 5
-    },
-    "_material": null,
-    "_isTrigger": false,
-    "_center": {
-      "__type__": "cc.Vec3",
-      "x": -1,
-      "y": 0,
-      "z": 0
-    },
-    "_radius": 0.2,
-    "_id": ""
-  },
-  {
-    "__type__": "cc.CompPrefabInfo",
-    "fileId": "55x9sACwROKpVVK4wB5qZR"
-  },
-  {
-    "__type__": "00615unI/RN5qBEBkOKh0Ec",
-    "_name": "",
-    "_objFlags": 0,
-    "__editorExtras__": {},
-    "node": {
-      "__id__": 1
-    },
-    "_enabled": true,
-    "__prefab": {
-      "__id__": 7
-    },
-    "_id": ""
-  },
-  {
-    "__type__": "cc.CompPrefabInfo",
-    "fileId": "faRXjhgi9HV4Tg04s+sjA1"
-  },
-  {
-    "__type__": "cc.RigidBody",
-    "_name": "",
-    "_objFlags": 0,
-    "__editorExtras__": {},
-    "node": {
-      "__id__": 1
-    },
-    "_enabled": true,
-    "__prefab": {
-      "__id__": 9
-    },
-    "_group": 1,
-    "_type": 4,
-    "_mass": 1,
-    "_allowSleep": true,
-    "_linearDamping": 0.1,
-    "_angularDamping": 0.1,
-    "_useGravity": true,
-    "_linearFactor": {
-      "__type__": "cc.Vec3",
-      "x": 1,
-      "y": 1,
-      "z": 1
-    },
-    "_angularFactor": {
-      "__type__": "cc.Vec3",
-      "x": 1,
-      "y": 1,
-      "z": 1
-    },
-    "_id": ""
-  },
-  {
-    "__type__": "cc.CompPrefabInfo",
-    "fileId": "d2rh3xAn5AWLowgVCU+MWU"
   },
   {
     "__type__": "cc.PrefabInfo",

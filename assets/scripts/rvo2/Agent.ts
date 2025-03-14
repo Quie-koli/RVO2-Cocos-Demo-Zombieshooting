@@ -22,7 +22,8 @@ export default class Agent {
   timeHorizon = 0.0;
   timeHorizonObst = 0.0;
   velocity: Vector2D;
-  
+  tag=0;
+  type=0;
   computeNeighbors() {
     this.obstaclNeighbors = [];
     var rangeSq = RVOMath.sqr(this.timeHorizonObst * this.maxSpeed + this.radius);

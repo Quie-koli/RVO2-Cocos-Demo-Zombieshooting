@@ -103,12 +103,14 @@ export class playercontrol extends Component {
         this.weapon.muzzle.active=false
         
     }
-
+    static temp:Vec3=new Vec3(0,0,0);
     eject(){
         const a=GameMainManager.instance.bulletmgr.get();
-        a.lifetime=100;
         a.node.position=this.weapon.muzzle.worldPosition;
-        a.node.forward=this.weapon.muzzle.right.multiplyScalar(-1);
+         //a.node.forward=this.weapon.muzzle.right.multiplyScalar(-1);
+        this.weapon.muzzle.getWorldRotation().getEulerAngles(playercontrol.temp)
+        playercontrol.temp.x=playercontrol.temp.y
+        a.node.setRotationFromEuler(playercontrol.temp)
         this.weapon.bulletalreadyloaded--;
         this.weapon.muzzle.active=true
         this.scheduleOnce(this.hidemuzzlefire,0.1)

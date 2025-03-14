@@ -1,4 +1,4 @@
-import { _decorator, animation, Component, instantiate, Node, Prefab, random, resources, Vec3 } from 'cc';
+import { _decorator, animation, Component, instantiate, Node, Prefab, random, resources, SkinnedMeshRenderer, Vec3 } from 'cc';
 import { GameMainManager } from './GameMainManager';
 import Vector2D from './rvo2/Vector2D';
 import { zombieCom } from './zombieSys';
@@ -42,6 +42,8 @@ export class zombieMgr {
             c.name=a.id.toString();
             a.node.position=pos
             a.agentid=GameMainManager.instance.addAgent(a)
+            GameMainManager.instance.simulator.agents[a.agentid].tag=a.id;
+            GameMainManager.instance.simulator.agents[a.agentid].type=1;
         }else{
             a=this.zombiespool[typeofz].pop();
             GameMainManager.instance.entityManager.setEntityActive(a.entity,true)
@@ -51,6 +53,7 @@ export class zombieMgr {
             a.animcontroller.setValue("state",0);
             a.goal=undefined
         }
+        
         a.attack=false;
         a.idletype=0;
         a.state=0;

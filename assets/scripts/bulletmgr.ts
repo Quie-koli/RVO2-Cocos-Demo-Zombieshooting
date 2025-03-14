@@ -1,54 +1,50 @@
 import { _decorator, Component, instantiate, Node, PhysicsSystem, Prefab, resources } from 'cc';
-import { bulletdata } from './bulletdata';
+
 import { GameMainManager } from './GameMainManager';
+import Vector2D from './rvo2/Vector2D';
+import { bulletCom } from './bulletSys';
 const { ccclass, property } = _decorator;
 
 @ccclass('bulletMgr')
 export class bulletMgr{
     bulletprefab: Prefab;
-    bulletpool: bulletdata[] = new Array(0);
-    bulletshooting: Map<number, bulletdata> = new Map();
+    bulletpool: bulletCom[] = new Array(0);
     bulletnum: number=0;
+    temp: Vector2D=new Vector2D(0,0)
+    tempAgents: number[]=[]
     start_n(): void { 
-        //bulletMgr.instance=this;
         resources.load("bullet" , Prefab, (err, Prefab) => {this.bulletprefab = Prefab;});
     }
 
-    start() {
-
-    }
-
-    update(deltaTime: number) {
-        this.bulletshooting.forEach((value , key) =>{
-            value.node.setPosition(value.node.right.multiplyScalar(-value.speed).add(value.node.position));
-            value.lifetime--;
-            if(value.lifetime<=0)this.release(value);
-        });
-    }
-
-    get(): bulletdata{
-        let a: bulletdata;   
+    get(): bulletCom{
+        let a: bulletCom;   
         if(this.bulletpool.length==0)
         {
-            a = instantiate(this.bulletprefab).getComponent(bulletdata);
+            let p = instantiate(this.bulletprefab)
+            let e = GameMainManager.instance.entityManager.addEntity()
+            a=GameMainManager.instance.entityManager.addComponent(e,bulletCom)
+            a.node=p
             a.cid=this.bulletnum++;
+           
             a.node.setParent(GameMainManager.instance.node);
         }
         else
         {
             a =this.bulletpool.pop();
+            GameMainManager.instance.entityManager.setEntityActive(a.entity,true)
             a.node.active=true;
         }
-        this.bulletshooting.set(a.cid,a);
+        a.speed=10;
+        a.lifetime=2;
+
+
         return a;
     }
 
-    release(n: bulletdata){
-        if(this.bulletshooting.has(n.cid)){
-            this.bulletshooting.delete(n.cid);
-        }
+    release(n: bulletCom){
         this.bulletpool.push(n);
         n.node.active=false;
+        GameMainManager.instance.entityManager.setEntityActive(n.entity,false)
     }
 }
 

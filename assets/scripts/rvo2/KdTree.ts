@@ -8,17 +8,22 @@ import Vector2D from "./Vector2D";
 export default class KdTree {
   simulator: Simulator;
 
-  MAXLEAF_SIZE = 100;
+  MAXLEAF_SIZE = 2;
 
   private agents: Agent[] = [];
   private agentTree: AgentTreeNode[] = [];
   private obstacleTree: ObstacleTreeNode = new ObstacleTreeNode();
 
+  updatelist=false;
+  oblength: number;
+
   buildAgentTree() {
-    if (this.agents.length != this.simulator.agentsinuse.length) {
+    if (this.updatelist) {
       this.agents = this.simulator.agentsinuse;
       this.agentTree=[]
+      this.updatelist=false
       for (var i = 0, len = 2 * this.agents.length; i < len; i++) {
+
         this.agentTree.push(new AgentTreeNode());
       }
     }
@@ -83,7 +88,9 @@ export default class KdTree {
   }
 
   buildObstacleTree() {
+   
     var obstacles = this.simulator.obstacles;
+    this.oblength=obstacles.length;
     this.obstacleTree = this._buildObstacleTreeRecursive(obstacles);
   }
 
@@ -184,9 +191,8 @@ export default class KdTree {
             newObstacle.next = obstacleJ2;
             newObstacle.isConvex = true;
             newObstacle.unitDir = obstacleJ1.unitDir;
-
+            
             newObstacle.id = this.simulator.obstacles.length;
-
             this.simulator.obstacles.push(newObstacle);
 
             obstacleJ1.next = newObstacle;
@@ -212,9 +218,9 @@ export default class KdTree {
 
   computeAgentNeighbors(agent: Agent, rangeSq: number) {
     try{
-    this._queryAgentTreeRecursive(agent, rangeSq, 0);
-    }catch{
-      
+      this._queryAgentTreeRecursive(agent, rangeSq, 0);
+    }catch(aq){
+      console.log(aq)
     }
   }
 
@@ -259,7 +265,57 @@ export default class KdTree {
 
     }
   }
+   _queryPosdTree(position: Vector2D, rangeSq: number, snode: number,agentids: number[],num: number) {
+    let agentTree = this.agentTree;
+    const nNodes: number[]= [snode];
+    let node;
+    while(nNodes.length>0){
+      node=nNodes.pop();
+      if(num<=0)return
+     
+    if (agentTree[node].end - agentTree[node].begin <= this.MAXLEAF_SIZE) {
+      //console.log(agentTree[node].end)
+      for (var i = agentTree[node].begin; i <= agentTree[node].end; i++) {
+       
+        if(position.minus(this.agents[i].position).absSq()<rangeSq){
+          agentids.push(this.agents[i].id)
+          num--;
+          if(num<=0)return
+        }
+      }
+    } else {
+      let distSqLeft = RVOMath.sqr(Math.max(0, agentTree[agentTree[node].left].minX - position.x)) +
+        RVOMath.sqr(Math.max(0, position.x - agentTree[agentTree[node].left].maxX)) +
+        RVOMath.sqr(Math.max(0, agentTree[agentTree[node].left].minY - position.y)) +
+        RVOMath.sqr(Math.max(0, position.y - agentTree[agentTree[node].left].maxY));
 
+      let distSqRight = RVOMath.sqr(Math.max(0, agentTree[agentTree[node].right].minX - position.x)) +
+        RVOMath.sqr(Math.max(0, position.x - agentTree[agentTree[node].right].maxX)) +
+        RVOMath.sqr(Math.max(0, agentTree[agentTree[node].right].minY - position.y)) +
+        RVOMath.sqr(Math.max(0, position.y - agentTree[agentTree[node].right].maxY));
+
+      if (distSqLeft < distSqRight) {
+        if (distSqLeft < rangeSq) {
+          nNodes.push(agentTree[node].left);
+
+          if (distSqRight < rangeSq) {
+            nNodes.push(agentTree[node].right);
+          }
+        }
+      } else {
+        if (distSqRight < rangeSq) {
+          nNodes.push(agentTree[node].right);
+
+          if (distSqLeft < rangeSq) {
+            nNodes.push(agentTree[node].left);
+
+          }
+        }
+      }
+
+    }
+  }
+  }
   // pass ref range
   private _queryObstacleTreeRecursive(agent: Agent, rangeSq: number, node: ObstacleTreeNode) {
     if (node == null) {
@@ -287,6 +343,40 @@ export default class KdTree {
         this._queryObstacleTreeRecursive(agent, rangeSq, (agentLeftOfLine >= 0 ? node.right : node.left));
       }
     }
+  }
+  _checkObstacleTreeByPos(position: Vector2D, rangeSq: number) {
+   
+    let nodes: ObstacleTreeNode[]=[this.obstacleTree]
+    let node;
+     while(nodes.length>0){
+      
+      node=nodes.pop();
+      if(node==null)continue;
+      let obstacle1 = node.obstacle;
+      let obstacle2 = obstacle1.next;
+
+      let agentLeftOfLine = RVOMath.leftOf(obstacle1.point, obstacle2.point, position);
+
+      nodes.push((agentLeftOfLine >= 0 )? node.left : node.right);
+
+      let distSqLine = RVOMath.sqr(agentLeftOfLine) / RVOMath.absSq(obstacle2.point.minus(obstacle1.point));
+
+      if (distSqLine < rangeSq) {
+        if (agentLeftOfLine < 0) {
+          let distSq = RVOMath.distSqPointLineSegment(obstacle1.point, obstacle2.point, position)
+              
+              if (distSq < rangeSq) {
+                return true;
+
+              }
+          
+        }
+
+        nodes.push((agentLeftOfLine >= 0 )? node.right : node.left);
+      }
+    }
+    return false;
+    
   }
 
   queryVisibility(q1: Vector2D, q2: Vector2D, radius: number): boolean {

@@ -13,24 +13,32 @@ export class zombieCom extends IComponent{
     zombietype: number;
     id: number;
     animcontroller: animation.AnimationController;
-    state: number;
+    state: zombieState;
     attack: boolean;
     idletype: number;
     hp: number;
     node: Node;
-    nextstate: number;
+    nextstate: zombieState;
     count: number;
     agentid: number;
     goal: Vector2D;
     dis_catching: number=10;
     dis_hit: number=2; 
 }
-
+enum zombieState{
+    idle=0,
+    running=2,
+    die=3
+}
 @ccclass('zombieSys')
 export class zombieSys extends BaseSystem{
-    components: Map<Entity,zombieCom>=new Map()
+    components: Map<number,zombieCom>=new Map()
+    static temp=new Vector2D(0,0);
+    static temp3=new Vec3(0,0,0);
+    static temp2=new Vec3(0,0,0);
     upfucs: Function[] = [this.idleup,this.idleup,this.runup,this.dieup];
     inifucs: Function[] = [this.idleini,this.idleini,this.runini,this.dieini];
+
     async update(value, deltaTime: number) {
         this.upfucs[value.state](deltaTime,value);
         if(value.nextstate != value.state){
@@ -41,10 +49,11 @@ export class zombieSys extends BaseSystem{
     }
 
     idleup(deltaTime: number,z: zombieCom){
-        let temp=new Vector2D(GameMainManager.instance.player.position.x-z.node.position.x,GameMainManager.instance.player.position.y-z.node.position.z) 
-        let dis =temp.abs()
+        zombieSys.temp.x=GameMainManager.instance.player.position.x-z.node.position.x
+        zombieSys.temp.y=GameMainManager.instance.player.position.y-z.node.position.z
+        let dis =zombieSys.temp.abs()
         if(dis<z.dis_catching){
-            z.nextstate=2;
+            z.nextstate=zombieState.running;
         }
     }
     checkGoal(i:number){
@@ -69,10 +78,11 @@ export class zombieSys extends BaseSystem{
     }
 
     runup(deltaTime: number,z: zombieCom){
-        let temp=new Vector2D(GameMainManager.instance.player.position.x-z.node.position.x,GameMainManager.instance.player.position.y-z.node.position.z) 
-        let dis =temp.abs()
+        zombieSys.temp.x=GameMainManager.instance.player.position.x-z.node.position.x
+        zombieSys.temp.y=GameMainManager.instance.player.position.y-z.node.position.z
+        let dis =zombieSys.temp.abs()
         if(dis>z.dis_catching){
-            z.nextstate=0;
+            z.nextstate=zombieState.idle;
         }
         else
         if(dis<z.dis_hit){
@@ -94,13 +104,16 @@ export class zombieSys extends BaseSystem{
     
         //插值化丝滑地朝向玩家
         let quat: Quat = new Quat();
-        Quat.fromEuler(quat,0,(z.node.eulerAngles.y, 90-Math.atan2(temp.y,temp.x)*rta),0)
+        Quat.fromEuler(quat,0,(z.node.eulerAngles.y, 90-Math.atan2(zombieSys.temp.y,zombieSys.temp.x)*rta),0)
         Quat.slerp(quat,z.node.rotation,quat,deltaTime);
-        z.node.setRotationFromEuler(new Vec3(0,(z.node.eulerAngles.y, 90-Math.atan2(temp.y,temp.x)*rta),0));
+        zombieSys.temp2.y=(z.node.eulerAngles.y, 90-Math.atan2(zombieSys.temp.y,zombieSys.temp.x)*rta);
+        z.node.setRotationFromEuler(zombieSys.temp2);
         
         let c=GameMainManager.instance.simulator.agents[z.agentid];
         c.update(deltaTime);
-        z.node.position=new Vec3(GameMainManager.instance.simulator.agents[z.agentid].position.x,GameMainManager.instance.ground_y,GameMainManager.instance.simulator.agents[z.agentid].position.y)
+        zombieSys.temp3.x=c.position.x
+        zombieSys.temp3.z=c.position.y
+        z.node.position=zombieSys.temp3
     }
 
     dieup(deltaTime: number,z: zombieCom){
@@ -120,17 +133,19 @@ export class zombieSys extends BaseSystem{
     }
 
     hit(id: number){
+       
         let a = GameMainManager.instance.zombiemgr.zombieshowings.get(id);
+        if(a.nextstate==zombieState.die||a.state==zombieState.die)return;
         a.hp--;
         if(a.hp<=0){
             a.animcontroller.setValue("attacking",false);
-            a.nextstate=3;
+            a.nextstate=zombieState.die;
         }
     }
 
 }
 
-EntityManager.registerComponent(new zombieSys,zombieCom)
+
 
 
 function getRandomIntInclusive(min: number, max: number): number {

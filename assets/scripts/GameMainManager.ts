@@ -41,6 +41,7 @@ export class GameMainManager extends Component {
         this.zombiemgr=new (zombieMgr)()
         this.zombiemgr.start_n();
         this.zombiesys=new (zombieSys)()
+        EntityManager.registerComponent(this.zombiesys,zombieCom)
         this.bulletmgr=new bulletMgr()
         this.bulletmgr.start_n();
         this.weaponmgr=new weaponMgr()
@@ -74,7 +75,7 @@ export class GameMainManager extends Component {
     }
    protected update(dt: number): void {
         //this.zombiesys.update(dt)
-        this.bulletmgr.update(dt)
+        
         this.entityManager.update(dt)
    }
    
